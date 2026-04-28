@@ -8,8 +8,8 @@ VisionMouse is a high-performance computer vision project built with C++  . It e
 - Precision Cursor Mapping:Smoothly maps camera coordinates to screen resolution.
 - Advanced Smoothing: Implements a Moving Average Filter (DSA-based) to eliminate hand jitter.
 - Gesture Shortcuts: - Index Finger Move: Move Cursor.
-    -  Pinch (Thumb + Index) : Left Click.
-    -  Two Fingers Up : Scroll Mode.
+    - Pinch (Thumb + Index) : Left Click.
+    - Two Fingers Up : Scroll Mode.
 
 ## Tech Stack
 - Language: C++17
