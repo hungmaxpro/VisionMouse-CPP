@@ -1,7 +1,0 @@
-<Solution>
-  <Configurations>
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Project Path="VisionMouse-CPP/VisionMouse-CPP.vcxproj" Id="32bb3cbb-ac89-44b3-a8ee-52f68042cfec" />
-</Solution>
