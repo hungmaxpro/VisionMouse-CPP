@@ -1,19 +1,26 @@
 #include <iostream>
 #include <winsock2.h>
 #include <string>
+#include <windows.h> 
 
 #pragma comment(lib, "ws2_32.lib") // Cách 2 để link thư viện mà không cần vào Properties
 
 using namespace std;
 
 int main() {
-    // --- KHỞI TẠO WINSOCK ---
+    // Khởi tạo winsock
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 
     // Tạo Socket UDP
     SOCKET serverSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    
+    //Lấy chiều dài, rộng của màn hình
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
+    float strx,stry,xcam,ycam;
+    
     
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
@@ -39,8 +46,14 @@ int main() {
 
             // Tạm thời in ra màn hình để test xem "thông mạng" chưa
             cout << "Nhan duoc: " << data << endl;
-        }
+            strx = data.find("x");
+            stry = data.find("y");
+            xcam = stof(data.substr(strx + 3, stry - strx - 6));
+            ycam = stof(data.substr(stry+3, data.find("}") - stry));
+            
 
+            SetCursorPos(xcam * screenWidth, ycam * screenHeight);
+        }
         // Thoát nếu bấm phím (tùy chọn)
         if (GetKeyState('Q') & 0x8000) break;
     }
