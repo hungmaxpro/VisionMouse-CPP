@@ -2,8 +2,9 @@
 #include <winsock2.h>
 #include <string>
 #include <windows.h> 
+#include <deque>
 
-#pragma comment(lib, "ws2_32.lib") // Cách 2 để link thư viện mà không cần vào Properties
+#pragma comment(lib, "ws2_32.lib") 
 
 using namespace std;
 
@@ -13,6 +14,9 @@ int main() {
     xlast = -1;
     ylast = -1;
     POINT Current;
+    deque<float> queueX; 
+    deque<float> queueY;
+
     // Khởi tạo winsock
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -20,26 +24,21 @@ int main() {
     // Tạo Socket UDP
     SOCKET serverSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     
-
-    //Lấy chiều dài, rộng của màn hình
-    SetProcessDPIAware(); // Hàm giúp trả về tọa độ pixel thực tế
-    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-
-    
-    
-    
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(5005);
     serverAddr.sin_addr.s_addr = INADDR_ANY;
 
-    
     bind(serverSocket, (sockaddr*)&serverAddr, sizeof(serverAddr));
 
     char buffer[1024];
     sockaddr_in clientAddr;
     int clientAddrLen = sizeof(clientAddr);
+
+    //Lấy chiều dài, rộng của màn hình
+    SetProcessDPIAware(); // Hàm giúp trả về tọa độ pixel thực tế
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
     while (true) {
        
@@ -58,11 +57,35 @@ int main() {
             xcam = stof(data.substr(strx + 3, stry - strx - 6));
             ycam = stof(data.substr(stry+3, data.find("}") - stry));
             
+            // Dùng hàng đợi tối ưu chuột
+            queueX.push_back(xcam);
+            queueY.push_back(ycam);
+            if (queueX.size() > 5 && queueY.size() > 5) {
+                queueX.pop_front();
+                queueY.pop_front();
+            }
+            float sumX = 0;
+            float sumY = 0;
+            cout << "\n hang doi X:";
+            for (float i : queueX) {
+                sumX += i;
+                cout << i << ", ";
+            }
+            cout << "\n hang doi Y";
+            for (float i : queueY) {
+                sumY += i;
+                cout << i << ", ";
+            }
+            sumX /= queueX.size();
+            sumY /= queueY.size();
+            cout << "\nsumX: " << sumX << "sumY: " << sumY << endl;
+
+
             // Tính toán độ di chuyển của tọa độ chuột
             sensitive = 2;
             GetCursorPos(&Current);
-            xnew = xcam;
-            ynew = ycam;
+            xnew = sumX;
+            ynew = sumY;
                 // Frame đầu chưa di chuyển chuột
             if (xlast == -1 && ylast == -1) {
                 xlast=xnew;
@@ -71,8 +94,8 @@ int main() {
             }
             Current.x += (xnew - xlast) * sensitive * screenWidth;
             Current.y += (ynew - ylast) * sensitive * screenHeight;
-
-            // Điều khiển con chuột
+            
+            // Điều khiển chuột
             SetCursorPos(Current.x,Current.y);
 
             xlast = xnew;
