@@ -1,5 +1,4 @@
 # VisionMouse-CPP: AI-Powered Hand Gesture Controller
-
 ## Overview
 VisionMouse is a high-performance computer vision project built with C++  . It enables users to control their PC's cursor and execute commands using real-time hand gestures. Unlike common Python implementations, this project focuses on low-latency execution and memory efficiency , making it suitable for Edge AI environments.
 
