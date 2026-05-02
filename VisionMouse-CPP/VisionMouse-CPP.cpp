@@ -8,6 +8,11 @@
 using namespace std;
 
 int main() {
+    float strx, stry, xcam, ycam;
+    float xlast, ylast, xnew, ynew, sensitive;
+    xlast = -1;
+    ylast = -1;
+    POINT Current;
     // Khởi tạo winsock
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -15,11 +20,13 @@ int main() {
     // Tạo Socket UDP
     SOCKET serverSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     
+
     //Lấy chiều dài, rộng của màn hình
+    SetProcessDPIAware(); // Hàm giúp trả về tọa độ pixel thực tế
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    float strx,stry,xcam,ycam;
+    
     
     
     sockaddr_in serverAddr;
@@ -29,8 +36,6 @@ int main() {
 
     
     bind(serverSocket, (sockaddr*)&serverAddr, sizeof(serverAddr));
-
-    
 
     char buffer[1024];
     sockaddr_in clientAddr;
@@ -44,17 +49,38 @@ int main() {
             buffer[bytesRead] = '\0';
             string data(buffer);
 
-            // Tạm thời in ra màn hình để test xem "thông mạng" chưa
-            cout << "Nhan duoc: " << data << endl;
+            
+            cout << data << endl;
+
+            // Lấy tọa độ x,y
             strx = data.find("x");
             stry = data.find("y");
             xcam = stof(data.substr(strx + 3, stry - strx - 6));
             ycam = stof(data.substr(stry+3, data.find("}") - stry));
             
+            // Tính toán độ di chuyển của tọa độ chuột
+            sensitive = 2;
+            GetCursorPos(&Current);
+            xnew = xcam;
+            ynew = ycam;
+                // Frame đầu chưa di chuyển chuột
+            if (xlast == -1 && ylast == -1) {
+                xlast=xnew;
+                ylast=ynew;
+                continue;
+            }
+            Current.x += (xnew - xlast) * sensitive * screenWidth;
+            Current.y += (ynew - ylast) * sensitive * screenHeight;
 
-            SetCursorPos(xcam * screenWidth, ycam * screenHeight);
+            // Điều khiển con chuột
+            SetCursorPos(Current.x,Current.y);
+
+            xlast = xnew;
+            ylast = ynew;
+
         }
-        // Thoát nếu bấm phím (tùy chọn)
+
+        // Thoát 
         if (GetKeyState('Q') & 0x8000) break;
     }
 
