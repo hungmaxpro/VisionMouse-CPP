@@ -3,7 +3,7 @@ import mediapipe as mp
 import socket
 import json
 
-# Cấu hình Socket (UDP) để gửi data sang C++
+# Cấu hình Socket UDP để gửi data sang C++
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 server_address = ('127.0.0.1', 5005)
 
@@ -18,7 +18,7 @@ while cap.isOpened():
 
     image = cv2.flip(image, 1)
     results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-
+    
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
             # Lấy tọa độ ngón trỏ (điểm số 8)
