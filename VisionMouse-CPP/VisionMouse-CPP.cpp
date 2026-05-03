@@ -3,6 +3,7 @@
 #include <string>
 #include <windows.h> 
 #include <deque>
+#include <shellapi.h>
 
 #pragma comment(lib, "ws2_32.lib") 
 
@@ -17,6 +18,9 @@ int main() {
     deque<float> queueX; 
     deque<float> queueY;
 
+    //Chạy file python
+    ShellExecuteA(NULL, "open", "cmd.exe", "/k python \"Python_Sensor/Python Sensor.py\"", NULL, SW_SHOW);
+   
     // Khởi tạo winsock
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);

@@ -21,9 +21,11 @@ while cap.isOpened():
     
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
-            # Lấy tọa độ ngón trỏ (điểm số 8)
+            # Lấy tọa độ ngón 
             index_finger = hand_landmarks.landmark[8]
+            below_finger = hand_landmarks.landmark[6]
             data = {"x": index_finger.x, "y": index_finger.y}
+            
             
             # Ném tọa độ sang C++
             sock.sendto(json.dumps(data).encode(), server_address)
