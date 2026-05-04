@@ -4,6 +4,7 @@
 #include <windows.h> 
 #include <deque>
 #include <shellapi.h>
+#include <sstream>
 
 #pragma comment(lib, "ws2_32.lib") 
 
@@ -17,7 +18,7 @@ int main() {
     POINT Current;
     deque<float> queueX; 
     deque<float> queueY;
-
+    string temp;
     //Chạy file python
     ShellExecuteA(NULL, "open", "cmd.exe", "/k python \"Python_Sensor/Python Sensor.py\"", NULL, SW_SHOW);
    
@@ -52,15 +53,17 @@ int main() {
             buffer[bytesRead] = '\0';
             string data(buffer);
 
-            
             cout << data << endl;
 
             // Lấy tọa độ x,y
-            strx = data.find("x");
-            stry = data.find("y");
-            xcam = stof(data.substr(strx + 3, stry - strx - 6));
-            ycam = stof(data.substr(stry+3, data.find("}") - stry));
-            
+            stringstream ss(data);
+            getline(ss, temp, '[');
+            getline(ss, temp, ',');
+            xcam = stof(temp);
+            getline(ss, temp, ',');
+            ycam = stof(temp);
+
+           
             // Dùng hàng đợi tối ưu chuột
             queueX.push_back(xcam);
             queueY.push_back(ycam);

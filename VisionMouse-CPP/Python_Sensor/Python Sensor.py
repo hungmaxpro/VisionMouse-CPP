@@ -24,13 +24,13 @@ while cap.isOpened():
             # Lấy tọa độ ngón 
             index_finger = hand_landmarks.landmark[8]
             below_finger = hand_landmarks.landmark[6]
-            data = {"x": index_finger.x, "y": index_finger.y}
+            data = index_finger.x, index_finger.y
             
             
             # Ném tọa độ sang C++
             sock.sendto(json.dumps(data).encode(), server_address)
             mp.solutions.drawing_utils.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-    cv2.imshow('AI Sensor (Python)', image)
+    cv2.imshow('AI Sensor', image)
     if cv2.waitKey(1) & 0xFF == ord('q'): break
 
 cap.release()
