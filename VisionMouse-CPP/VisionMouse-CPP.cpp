@@ -5,21 +5,23 @@
 #include <deque>
 #include <shellapi.h>
 #include <sstream>
+#include <math.h>
+using namespace std;
 
 #pragma comment(lib, "ws2_32.lib") 
 
-using namespace std;
-
+    //Chạy file python
 int main() {
-    float strx, stry, xcam, ycam;
+    float xcam, ycam,xgiua,ygiua;
+    deque<float> queueY;
+    string temp;
     float xlast, ylast, xnew, ynew, sensitive;
     xlast = -1;
     ylast = -1;
+
     POINT Current;
+
     deque<float> queueX; 
-    deque<float> queueY;
-    string temp;
-    //Chạy file python
     ShellExecuteA(NULL, "open", "cmd.exe", "/k python \"Python_Sensor/Python Sensor.py\"", NULL, SW_SHOW);
    
     // Khởi tạo winsock
@@ -62,7 +64,10 @@ int main() {
             xcam = stof(temp);
             getline(ss, temp, ',');
             ycam = stof(temp);
-
+            getline(ss, temp, ',');
+            xgiua = stof(temp);
+            getline(ss, temp, ']');
+            ygiua = stof(temp);
            
             // Dùng hàng đợi tối ưu chuột
             queueX.push_back(xcam);
@@ -102,6 +107,12 @@ int main() {
             Current.x += (xnew - xlast) * sensitive * screenWidth;
             Current.y += (ynew - ylast) * sensitive * screenHeight;
             
+            if ((sqrt(pow(xcam - xgiua, 2) + (pow(ycam - ygiua, 2))))==0) {
+                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                Sleep(50);
+                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            }
+
             // Điều khiển chuột
             SetCursorPos(Current.x,Current.y);
 
