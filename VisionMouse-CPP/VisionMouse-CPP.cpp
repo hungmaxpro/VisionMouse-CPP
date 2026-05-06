@@ -9,8 +9,7 @@
 using namespace std;
 
 #pragma comment(lib, "ws2_32.lib") 
-
-    //Chạy file python
+  
 int main() {
     float xcam, ycam,xgiua,ygiua;
     deque<float> queueY;
@@ -18,10 +17,11 @@ int main() {
     float xlast, ylast, xnew, ynew, sensitive;
     xlast = -1;
     ylast = -1;
-
+    bool chamtay=false;
     POINT Current;
-
     deque<float> queueX; 
+
+    //Chạy file python
     ShellExecuteA(NULL, "open", "cmd.exe", "/k python \"Python_Sensor/Python Sensor.py\"", NULL, SW_SHOW);
    
     // Khởi tạo winsock
@@ -55,7 +55,7 @@ int main() {
             buffer[bytesRead] = '\0';
             string data(buffer);
 
-            cout << data << endl;
+            //cout << data << endl;
 
             // Lấy tọa độ x,y
             stringstream ss(data);
@@ -78,23 +78,23 @@ int main() {
             }
             float sumX = 0;
             float sumY = 0;
-            cout << "\n hang doi X:";
+            //cout << "\n hang doi X:";
             for (float i : queueX) {
                 sumX += i;
-                cout << i << ", ";
+                //cout << i << ", ";
             }
-            cout << "\n hang doi Y";
+            //cout << "\n hang doi Y";
             for (float i : queueY) {
                 sumY += i;
-                cout << i << ", ";
+                //cout << i << ", ";
             }
             sumX /= queueX.size();
             sumY /= queueY.size();
-            cout << "\nsumX: " << sumX << "sumY: " << sumY << endl;
+            //cout << "\nsumX: " << sumX << "sumY: " << sumY << endl;
 
 
             // Tính toán độ di chuyển của tọa độ chuột
-            sensitive = 2;
+            sensitive = 2.5;
             GetCursorPos(&Current);
             xnew = sumX;
             ynew = sumY;
@@ -106,11 +106,14 @@ int main() {
             }
             Current.x += (xnew - xlast) * sensitive * screenWidth;
             Current.y += (ynew - ylast) * sensitive * screenHeight;
-            
-            if ((sqrt(pow(xcam - xgiua, 2) + (pow(ycam - ygiua, 2))))==0) {
+            if ((sqrt(pow(xcam - xgiua, 2) + (pow(ycam - ygiua, 2)))) > 0.04) {
+                chamtay = false;
+            }
+            if ((sqrt(pow(xcam - xgiua, 2) + (pow(ycam - ygiua, 2)))) <0.04 && chamtay==false) {
                 mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                Sleep(50);
                 mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+                chamtay = true;
+
             }
 
             // Điều khiển chuột
