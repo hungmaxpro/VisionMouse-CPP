@@ -1,19 +1,24 @@
-# VisionMouse-CPP: AI-Powered Hand Gesture Controller
-## Overview
-VisionMouse is a high-performance computer vision project built with C++  . It enables users to control their PC's cursor and execute commands using real-time hand gestures. Unlike common Python implementations, this project focuses on low-latency execution and memory efficiency , making it suitable for Edge AI environments.
+AI Virtual Mouse: Real-time Hand Gesture Control
 
-## Key Features
-- Real-time Hand Tracking: Leveraging MediaPipe's hand landmark detection.
-- Precision Cursor Mapping:Smoothly maps camera coordinates to screen resolution.
-- Advanced Smoothing: Implements a Moving Average Filter (DSA-based) to eliminate hand jitter.
-- Gesture Shortcuts: - Index Finger Move: Move Cursor.
-    - Pinch (Thumb + Index) : Left Click.
-    - Two Fingers Up : Scroll Mode.
+**Overview**
+A polyglot application that controls the Windows mouse cursor using hand gestures via a webcam. Python serves as the computer vision engine (extracting hand landmarks), while C++ acts as the high-performance controller, executing OS-level commands. The two processes communicate in real-time via UDP Sockets.
 
-## Tech Stack
-- Language: C++17
-- Vision: OpenCV
-- AI Framework:MediaPipe (C++ API)
-- OS Interface: Windows API (User32.lib)
+**Key Features**
+Zero-Jitter Tracking: Implemented a Moving Average Filter using std::deque in C++ to smooth out webcam noise and stabilize cursor movement.
+Precise Click Mechanism: Uses Euclidean distance and state-flag debouncing logic to simulate natural mouse clicks and prevent continuous "double-click" glitches.
+Auto-Launch: C++ automatically triggers the Python background process via ShellExecuteA for a seamless 1-click startup.
 
- Developed as part of my journey to master Edge AI and Computer Vision. 
+**System Architecture**
+Vision Module (Python): OpenCV reads frames; MediaPipe extracts hand landmarks and packages them into JSON.
+IPC (Inter-Process Communication): Streams JSON data from Python to C++ via local UDP Socket (127.0.0.1:5005) for maximum throughput and minimum latency.
+Control Module (C++): Parses the JSON stream, calculates the moving average, and uses Win32 API (SetCursorPos, mouse_event) to manipulate the system cursor dynamically.
+
+**Challenges Solved**
+Dependency Hell: Resolved C++ ABI conflicts between MediaPipe and NumPy 2.x by strictly isolating the environment to Python 3.10 and locking core dependencies.
+I/O Bottlenecks: Eliminated synchronous console I/O operations in the C++ loop to keep up with the 30+ FPS UDP stream, instantly fixing severe cursor lag.
+State Management: Built a robust debouncing algorithm to translate a continuous 30 FPS camera feed into distinct, single hardware clicks.
+
+**Key Learnings**
+Deep understanding of UDP Sockets for real-time Inter-Process Communication.
+Direct OS manipulation and hardware event simulation using the Win32 API.
+Cross-language debugging and handling runtime memory issues (e.g., string parsing leaks, uninitialized states).
