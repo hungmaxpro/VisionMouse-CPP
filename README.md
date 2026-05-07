@@ -1,4 +1,4 @@
-#AI Virtual Mouse: Real-time Hand Gesture Control
+# AI Virtual Mouse: Real-time Hand Gesture Control
 
 **Overview**
 
