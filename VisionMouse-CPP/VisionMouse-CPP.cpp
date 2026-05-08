@@ -17,7 +17,9 @@ int main() {
     float xlast, ylast, xnew, ynew, sensitive;
     xlast = -1;
     ylast = -1;
-    bool clicktrai=true;
+    bool chamtay=false;
+    bool clicktrai = true;
+    bool dichuyen = true;
   
     POINT Current;
     deque<float> queueX; 
@@ -103,31 +105,43 @@ int main() {
                 ylast=ynew;
                 continue;
             }
-
-            Current.x += (xnew - xlast) * sensitive * screenWidth;
-            Current.y += (ynew - ylast) * sensitive * screenHeight;
-
+            
+            if (dichuyen) {
+                Current.x += (xnew - xlast) * sensitive * screenWidth;
+                Current.y += (ynew - ylast) * sensitive * screenHeight;
+            }
             // Click chuột
             if ((sqrt(pow(xtro - xgiua, 2) + (pow(ytro - ygiua, 2)))) > 0.02) {
-                clicktrai = true;
+                chamtay = false;
             }
-            if ((sqrt(pow(xtro - xgiua, 2) + (pow(ytro - ygiua, 2)))) <0.02 && clicktrai==true) {
+            if ((sqrt(pow(xtro - xgiua, 2) + (pow(ytro - ygiua, 2)))) <0.02 && chamtay==false && clicktrai==true) {
                 mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
                 mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                clicktrai = false;
+                chamtay = true;
 
             }
 
             // Cuộn chuột
-            if ((sqrt(pow(xcai - xtro, 2) + (pow(ycai - ytro, 2)))) < 0.04 && ynew - ylast > 0.05) {
-                mouse_event(MOUSEEVENTF_WHEEL, 0, 0, 50,0 );
+            if ((sqrt(pow(xcai - xtro, 2) + (pow(ycai - ytro, 2)))) < 0.04 ) {
+                clicktrai = false;
+                dichuyen = false;
+                if (ynew - ylast > 0.01) {
+                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, 100, 0);
+                }
+                else if (ynew - ylast < -0.01) {
+                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -100, 0);
+                }
+                
             }
-            else if ((sqrt(pow(xcai - xtro, 2) + (pow(ycai - ytro, 2)))) < 0.04 && ynew - ylast < -0.05) {
-            mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -50, 0);
+            else {
+                dichuyen = true;
+                clicktrai = true;
             }
 
             // Điều khiển chuột
-            SetCursorPos(Current.x,Current.y);
+            if (dichuyen == true) {
+                SetCursorPos(Current.x, Current.y);
+            }
             xlast = xnew;
             ylast = ynew;
 
