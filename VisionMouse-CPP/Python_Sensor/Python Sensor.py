@@ -23,10 +23,10 @@ while cap.isOpened():
         for hand_landmarks in results.multi_hand_landmarks:
             # Lấy tọa độ ngón 
             index_finger = hand_landmarks.landmark[8]
-            below_finger = hand_landmarks.landmark[12]
-            data = index_finger.x, index_finger.y,below_finger.x, below_finger.y
+            mid_finger = hand_landmarks.landmark[12]
+            thumb_finger= hand_landmarks.landmark[4]
+            data = index_finger.x, index_finger.y,mid_finger.x, mid_finger.y, thumb_finger.x, thumb_finger.y
 
-            
             # Ném tọa độ sang C++
             sock.sendto(json.dumps(data).encode(), server_address)
             mp.solutions.drawing_utils.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
