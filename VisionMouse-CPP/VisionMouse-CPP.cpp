@@ -11,27 +11,44 @@ using namespace std;
 #pragma comment(lib, "ws2_32.lib") 
 
 struct Toadotay {
-    int xtro;
-    int ytro;
-    int xgiua;
-    int ygiua;
-    int xcai;
-    int ycai;
+    float xtro, ytro, xgiua, ygiua, xcai, ycai;
 };
-
 struct Trangthaichuot {
-    bool chamtay;
-    bool clicktrai;
-    bool dichuyen;
+    bool chamtay, clicktrai, dichuyen;
 };
 
 struct Toadochuot {
-    float xlast;
-    float ylast;
-    float xnew;
-    float ynew;
+    float xlast, ylast, xnew, ynew;
 };
 
+void clickchuot(Toadotay tay,Trangthaichuot &trangthai) {
+    if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) > 0.02) {
+        trangthai.chamtay = false;
+    }
+    if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) < 0.02 && trangthai.chamtay == false && trangthai.clicktrai == true) {
+        mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+        mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+        trangthai.chamtay = true;
+
+    }
+}
+
+void cuonchuot(Toadotay tay, Trangthaichuot &trangthai, Toadochuot toado) {
+    if ((sqrt(pow(tay.xcai - tay.xtro, 2) + (pow(tay.ycai - tay.ytro, 2)))) < 0.04) {
+        trangthai.clicktrai = false;
+        trangthai.dichuyen = false;
+        if (toado.ynew - toado.ylast > 0.01) {
+            mouse_event(MOUSEEVENTF_WHEEL, 0, 0, 100, 0);
+        }
+        else if (toado.ynew - toado.ylast < -0.01) {
+            mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -100, 0);
+        }
+    }
+    else {
+        trangthai.dichuyen = true;
+        trangthai.clicktrai = true;
+    }
+}
 
 int main() {
     Toadotay tay;
@@ -134,32 +151,10 @@ int main() {
                 Current.y += (toado.ynew - toado.ylast) * sensitive * screenHeight;
             }
             // Click chuột
-            if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) > 0.02) {
-                trangthai.chamtay = false;
-            }
-            if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) <0.02 && trangthai.chamtay==false && trangthai.clicktrai==true) {
-                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                trangthai.chamtay = true;
-
-            }
+            clickchuot(tay, trangthai);
 
             // Cuộn chuột
-            if ((sqrt(pow(tay.xcai - tay.xtro, 2) + (pow(tay.ycai - tay.ytro, 2)))) < 0.04 ) {
-                trangthai.clicktrai = false;
-                trangthai.dichuyen = false;
-                if (toado.ynew - toado.ylast > 0.01) {
-                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, 100, 0);
-                }
-                else if (toado.ynew - toado.ylast < -0.01) {
-                    mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -100, 0);
-                }
-                
-            }
-            else {
-                trangthai.dichuyen = true;
-                trangthai.clicktrai = true;
-            }
+            cuonchuot(tay, trangthai, toado);
 
             // Điều khiển chuột
             if (trangthai.dichuyen) {
