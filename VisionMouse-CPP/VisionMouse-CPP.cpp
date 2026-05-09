@@ -9,18 +9,41 @@
 using namespace std;
 
 #pragma comment(lib, "ws2_32.lib") 
-  
+
+struct Toadotay {
+    int xtro;
+    int ytro;
+    int xgiua;
+    int ygiua;
+    int xcai;
+    int ycai;
+};
+
+struct Trangthaichuot {
+    bool chamtay;
+    bool clicktrai;
+    bool dichuyen;
+};
+
+struct Toadochuot {
+    float xlast;
+    float ylast;
+    float xnew;
+    float ynew;
+};
+
+
 int main() {
-    float xtro, ytro,xgiua,ygiua,xcai,ycai;
-    deque<float> queueY;
+    Toadotay tay;
+    Trangthaichuot trangthai{};
+    Toadochuot toado{};
+    deque<float> queueY{};
     string temp;
-    float xlast, ylast, xnew, ynew, sensitive;
-    xlast = -1;
-    ylast = -1;
-    bool chamtay=false;
-    bool clicktrai = true;
-    bool dichuyen = true;
-  
+    float sensitive;
+    toado.xlast = -1;
+    toado.ylast = -1;
+    trangthai.clicktrai = true;
+    trangthai.dichuyen = true;
     POINT Current;
     deque<float> queueX; 
 
@@ -29,7 +52,7 @@ int main() {
    
     // Khởi tạo winsock
     WSADATA wsaData;
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
+    WSAStartup(MAKEWORD(2,2), &wsaData);
 
     // Tạo Socket UDP
     SOCKET serverSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -46,7 +69,7 @@ int main() {
     int clientAddrLen = sizeof(clientAddr);
 
     //Lấy chiều dài, rộng của màn hình
-    SetProcessDPIAware(); // Hàm giúp trả về tọa độ pixel thực tế
+    SetProcessDPIAware(); 
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -62,21 +85,21 @@ int main() {
             stringstream ss(data);
             getline(ss, temp, '[');
             getline(ss, temp, ',');
-            xtro = stof(temp);
+            tay.xtro = stof(temp);
             getline(ss, temp, ',');
-            ytro = stof(temp);
+            tay.ytro = stof(temp);
             getline(ss, temp, ',');
-            xgiua = stof(temp);
+            tay.xgiua = stof(temp);
             getline(ss, temp, ',');
-            ygiua = stof(temp);
+            tay.ygiua = stof(temp);
             getline(ss, temp, ',');
-            xcai = stof(temp);
+            tay.xcai = stof(temp);
             getline(ss, temp, ']');
-            ycai = stof(temp);
+            tay.ycai = stof(temp);
            
             // Dùng hàng đợi tối ưu chuột
-            queueX.push_back(xtro);
-            queueY.push_back(ytro);
+            queueX.push_back(tay.xtro);
+            queueY.push_back(tay.ytro);
             if (queueX.size() > 5 && queueY.size() > 5) {
                 queueX.pop_front();
                 queueY.pop_front();
@@ -97,53 +120,53 @@ int main() {
             // Tính toán độ di chuyển của tọa độ chuột
             sensitive = 2.5;
             GetCursorPos(&Current);
-            xnew = sumX;
-            ynew = sumY;
+            toado.xnew = sumX;
+            toado.ynew = sumY;
                 // Frame đầu chưa di chuyển chuột
-            if (xlast == -1 && ylast == -1) {
-                xlast=xnew;
-                ylast=ynew;
+            if (toado.xlast == -1 && toado.ylast == -1) {
+                toado.xlast=toado.xnew;
+                toado.ylast=toado.ynew;
                 continue;
             }
             
-            if (dichuyen) {
-                Current.x += (xnew - xlast) * sensitive * screenWidth;
-                Current.y += (ynew - ylast) * sensitive * screenHeight;
+            if (trangthai.dichuyen) {
+                Current.x += (toado.xnew - toado.xlast) * sensitive * screenWidth;
+                Current.y += (toado.ynew - toado.ylast) * sensitive * screenHeight;
             }
             // Click chuột
-            if ((sqrt(pow(xtro - xgiua, 2) + (pow(ytro - ygiua, 2)))) > 0.02) {
-                chamtay = false;
+            if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) > 0.02) {
+                trangthai.chamtay = false;
             }
-            if ((sqrt(pow(xtro - xgiua, 2) + (pow(ytro - ygiua, 2)))) <0.02 && chamtay==false && clicktrai==true) {
+            if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) <0.02 && trangthai.chamtay==false && trangthai.clicktrai==true) {
                 mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
                 mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-                chamtay = true;
+                trangthai.chamtay = true;
 
             }
 
             // Cuộn chuột
-            if ((sqrt(pow(xcai - xtro, 2) + (pow(ycai - ytro, 2)))) < 0.04 ) {
-                clicktrai = false;
-                dichuyen = false;
-                if (ynew - ylast > 0.01) {
+            if ((sqrt(pow(tay.xcai - tay.xtro, 2) + (pow(tay.ycai - tay.ytro, 2)))) < 0.04 ) {
+                trangthai.clicktrai = false;
+                trangthai.dichuyen = false;
+                if (toado.ynew - toado.ylast > 0.01) {
                     mouse_event(MOUSEEVENTF_WHEEL, 0, 0, 100, 0);
                 }
-                else if (ynew - ylast < -0.01) {
+                else if (toado.ynew - toado.ylast < -0.01) {
                     mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -100, 0);
                 }
                 
             }
             else {
-                dichuyen = true;
-                clicktrai = true;
+                trangthai.dichuyen = true;
+                trangthai.clicktrai = true;
             }
 
             // Điều khiển chuột
-            if (dichuyen == true) {
+            if (trangthai.dichuyen) {
                 SetCursorPos(Current.x, Current.y);
             }
-            xlast = xnew;
-            ylast = ynew;
+            toado.xlast = toado.xnew;
+            toado.ylast = toado.ynew;
 
         }
 
