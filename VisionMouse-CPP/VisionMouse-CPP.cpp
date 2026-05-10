@@ -50,6 +50,11 @@ void cuonchuot(Toadotay tay, Trangthaichuot &trangthai, Toadochuot toado) {
     }
 }
 
+float xulidulieudauvao(stringstream &ss) {
+    string temp;
+    getline(ss, temp, ',');
+    return stof(temp);
+}
 int main() {
     Toadotay tay;
     Trangthaichuot trangthai{};
@@ -97,22 +102,16 @@ int main() {
         if (bytesRead > 0) {
             buffer[bytesRead] = '\0';
             string data(buffer);
-
-            // Lấy tọa độ x,y
+            data.erase(0, 1);
+            data.pop_back();
             stringstream ss(data);
-            getline(ss, temp, '[');
-            getline(ss, temp, ',');
-            tay.xtro = stof(temp);
-            getline(ss, temp, ',');
-            tay.ytro = stof(temp);
-            getline(ss, temp, ',');
-            tay.xgiua = stof(temp);
-            getline(ss, temp, ',');
-            tay.ygiua = stof(temp);
-            getline(ss, temp, ',');
-            tay.xcai = stof(temp);
-            getline(ss, temp, ']');
-            tay.ycai = stof(temp);
+
+            tay.xtro = xulidulieudauvao(ss);
+            tay.ytro = xulidulieudauvao(ss);
+            tay.xgiua = xulidulieudauvao(ss);
+            tay.ygiua = xulidulieudauvao(ss);
+            tay.xcai = xulidulieudauvao(ss);
+            tay.ycai = xulidulieudauvao(ss);
            
             // Dùng hàng đợi tối ưu chuột
             queueX.push_back(tay.xtro);
