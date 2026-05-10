@@ -70,7 +70,10 @@ int main() {
     deque<float> queueX; 
 
     //Chạy file python
-    ShellExecuteA(NULL, "open", "cmd.exe", "/k python \"Python_Sensor/Python Sensor.py\"", NULL, SW_SHOW);
+    STARTUPINFOA si = { sizeof(STARTUPINFOA) };
+    PROCESS_INFORMATION pi;
+    string cmd = "python \"Python_Sensor/Python Sensor.py\"";
+    CreateProcessA(NULL, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
    
     // Khởi tạo winsock
     WSADATA wsaData;
@@ -149,10 +152,9 @@ int main() {
                 Current.x += (toado.xnew - toado.xlast) * sensitive * screenWidth;
                 Current.y += (toado.ynew - toado.ylast) * sensitive * screenHeight;
             }
-            // Click chuột
+            
             clickchuot(tay, trangthai);
-
-            // Cuộn chuột
+            
             cuonchuot(tay, trangthai, toado);
 
             // Điều khiển chuột
@@ -165,7 +167,12 @@ int main() {
         }
 
         // Thoát 
-        if (GetKeyState('Q') & 0x8000) break;
+        if (GetKeyState('Q') & 0x8000) {
+            TerminateProcess(pi.hProcess, 0);
+            CloseHandle(pi.hProcess);     
+            CloseHandle(pi.hThread);
+            break;
+        }
     }
 
     closesocket(serverSocket);

@@ -30,7 +30,7 @@ while cap.isOpened():
             # Ném tọa độ sang C++
             sock.sendto(json.dumps(data).encode(), server_address)
             mp.solutions.drawing_utils.draw_landmarks(image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-    cv2.imshow('AI Sensor', image)
+    #cv2.imshow('AI Sensor', image)
     if cv2.waitKey(1) & 0xFF == ord('q'): break
 
 cap.release()
