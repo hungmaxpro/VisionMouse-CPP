@@ -9,6 +9,7 @@
 using namespace std;
 
 #pragma comment(lib, "ws2_32.lib") 
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
 struct Toadotay {
     float xtro, ytro, xgiua, ygiua, xcai, ycai;
@@ -22,10 +23,10 @@ struct Toadochuot {
 };
 
 void clickchuot(Toadotay tay,Trangthaichuot &trangthai) {
-    if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) > 0.02) {
+    if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) > 0.03) {
         trangthai.chamtay = false;
     }
-    if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) < 0.02 && trangthai.chamtay == false && trangthai.clicktrai == true) {
+    if ((sqrt(pow(tay.xtro - tay.xgiua, 2) + (pow(tay.ytro - tay.ygiua, 2)))) < 0.03 && trangthai.chamtay == false && trangthai.clicktrai == true) {
         mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
         mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         trangthai.chamtay = true;
@@ -72,7 +73,7 @@ int main() {
     //Chạy file python
     STARTUPINFOA si = { sizeof(STARTUPINFOA) };
     PROCESS_INFORMATION pi;
-    string cmd = "python \"Python_Sensor/Python Sensor.py\"";
+    string cmd = "\"Python Sensor.exe\"";
     CreateProcessA(NULL, (LPSTR)cmd.c_str(), NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
    
     // Khởi tạo winsock
@@ -168,9 +169,7 @@ int main() {
 
         // Thoát 
         if (GetKeyState('Q') & 0x8000) {
-            TerminateProcess(pi.hProcess, 0);
-            CloseHandle(pi.hProcess);     
-            CloseHandle(pi.hThread);
+            system("taskkill /F /IM \"Python Sensor.exe\" /T >nul 2>&1");
             break;
         }
     }
